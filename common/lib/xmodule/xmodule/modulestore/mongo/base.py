@@ -427,8 +427,7 @@ class MongoModuleStore(ModuleStoreBase):
         (0 = no descendents, 1 = children, 2 = grandchildren, etc)
         If depth is None, will load all the children.
         This will make a number of queries that is linear in the depth.
-        """
-
+        """ 
         data = {}
         to_process = list(items)
         while to_process and depth is None or depth >= 0:
@@ -453,6 +452,42 @@ class MongoModuleStore(ModuleStoreBase):
                 depth -= 1
 
         return data
+    def _cache_children_category(self, items, category, depth=0):
+        """
+        Returns a dictionary mapping Location -> item data, populated with json data
+        for all descendents of items up to the specified depth.
+        (0 = no descendents, 1 = children, 2 = grandchildren, etc)
+        If depth is None, will load all the children.
+        This will make a number of queries that is linear in the depth.
+        """ 
+        data = {}
+        c_data=[]
+        to_process = list(items)
+        while to_process and depth is None or depth >= 0:
+            children = []
+            for item in to_process:
+                self._clean_item_data(item)
+                children.extend(item.get('definition', {}).get('children', []))
+                data[Location(item['location'])] = item
+
+            if depth == 0:
+                break
+
+            # Load all children by id. See
+            # http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%24or
+            # for or-query syntax
+            to_process = []
+            if children:
+                to_process = self._query_children_for_cache_children(children)
+                for child in children:
+                    if child.split('/')[-2] == category:
+                        c_data.append(self.get_item(child))
+
+            # If depth is None, then we just recurse until we hit all the descendents
+            if depth is not None:
+                depth -= 1
+
+        return data,c_data
 
     def _load_item(self, item, data_cache, apply_cached_metadata=True):
         """
@@ -490,11 +525,24 @@ class MongoModuleStore(ModuleStoreBase):
         to specified depth
         """
         data_cache = self._cache_children(items, depth)
+        # if we are loading a course object, if we're not prefetching children (depth != 0) then don't
+        # bother with the metadata inheritance
+        
+        return [self._load_item(item, data_cache,
+                apply_cached_metadata=(item['location']['category'] != 'course' or depth != 0)) for item in items]
+
+    def _load_items_category(self, items, category, depth=0):
+        """
+        Load a list of xmodules from the data in items, with children cached up
+        to specified depth
+        """
+        data_cache,c_data = self._cache_children_category(items, category, depth)
 
         # if we are loading a course object, if we're not prefetching children (depth != 0) then don't
         # bother with the metadata inheritance
-        return [self._load_item(item, data_cache,
-                apply_cached_metadata=(item['location']['category'] != 'course' or depth != 0)) for item in items]
+
+        return [(self._load_item(item, data_cache,
+                apply_cached_metadata=(item['location']['category'] != 'course' or depth != 0)) for item in items),c_data]
 
     def get_courses(self):
         '''
@@ -567,7 +615,24 @@ class MongoModuleStore(ModuleStoreBase):
             calls to get_children() to cache. None indicates to cache all descendents.
         """
         return self.get_item(location, depth=depth)
-
+    #@begin:On testing code
+    #@date:2013-11-02  
+    def get_instance_items(self, course_id, location, category, depth=0):
+        """
+        Return an array all of the locations for orphans in the course.
+        """
+        '''
+        all_items = self.collection.find({
+            '_id.org': location.org,
+            '_id.course': location.course,
+            #'_id.category': {'$nin': detached_categories}
+        })
+        '''
+        location = Location.ensure_fully_specified(location)
+        item = self._find_one(location)
+        module = self._load_items_category([item], category, depth)[1]
+        return module
+    #@end
     def get_items(self, location, course_id=None, depth=0):
         items = self.collection.find(
             location_to_query(location),

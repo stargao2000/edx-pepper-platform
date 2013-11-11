@@ -10,16 +10,17 @@ import courseware.views
 from mitxmako.shortcuts import marketing_link
 from util.cache import cache_if_anonymous
 
-
 @ensure_csrf_cookie
 @cache_if_anonymous
 def index(request):
     '''
     Redirects to main page -- info page if user authenticated, or marketing if not
     '''
-
-    if settings.COURSEWARE_ENABLED and request.user.is_authenticated():
-        return redirect(reverse('dashboard'))
+#@begin:Able to visit homepage after login
+#@date:2013-11-02        
+    # if settings.COURSEWARE_ENABLED and request.user.is_authenticated():
+    #     return redirect(reverse('dashboard'))
+#@end    
 
     if settings.MITX_FEATURES.get('AUTH_USE_MIT_CERTIFICATES'):
         from external_auth.views import ssl_login
@@ -34,8 +35,6 @@ def index(request):
     #  we do not expect this case to be reached in cases where
     #  marketing and edge are enabled
     return student.views.index(request, user=request.user)
-
-
 
 @ensure_csrf_cookie
 @cache_if_anonymous
@@ -55,3 +54,41 @@ def courses(request):
     #  we do not expect this case to be reached in cases where
     #  marketing and edge are enabled
     return courseware.views.courses(request)
+
+#@begin:View of the new added page
+#@date:2013-11-02        
+@ensure_csrf_cookie
+@cache_if_anonymous
+def what_is(request):
+     return render_to_response('what_is.html', {})
+
+@ensure_csrf_cookie
+@cache_if_anonymous
+def districts(request):
+     return render_to_response('districts.html', {})
+
+@ensure_csrf_cookie
+@cache_if_anonymous
+def intro(request):
+     return render_to_response('intro.html', {})
+
+@ensure_csrf_cookie
+@cache_if_anonymous
+def intro_research(request):
+     return render_to_response('intro_research.html', {})
+
+@ensure_csrf_cookie
+@cache_if_anonymous
+def intro_ourteam(request):
+     return render_to_response('intro_ourteam.html', {})
+
+@ensure_csrf_cookie
+@cache_if_anonymous
+def intro_faq(request):
+    return render_to_response('intro_faq.html', {})
+
+@ensure_csrf_cookie
+@cache_if_anonymous
+def _contact(request):
+    return render_to_response('_contact.html', {})
+#@end

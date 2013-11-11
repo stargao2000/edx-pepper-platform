@@ -1,0 +1,79 @@
+/*---------------------------general(About us... -use)---------------------------*/
+._body_content_font
+{
+	font-size:14px !important;
+	color:#666;
+	line-height:21px;
+}
+._body_content_title_font
+{
+	font-size:18px !important;
+	color:#666;
+	font-weight:bold;
+}
+._banner_title_font
+{
+	font-size:25px;
+	color:#3461ad;
+	font-weight:350 !important;
+	text-align:left;
+	line-height:30px;
+	
+	padding-top:40px;
+	padding-left:23px;
+}
+._banner_title_content_font
+{
+	font-size:18px !important;
+	color:#666;
+	line-height:22px;
+	
+	padding-left:70px;
+}
+
+/*---------------------------down menu(FAQ, About Pepper -use)---------------------------*/
+._downmenu_pp{
+	width:680px;
+	height:auto;
+	padding-top:10px;
+	padding-left:10px;
+	}
+._downmenu_pp_title{
+	width:100%;
+	height:22px;
+	color:#666;
+	cursor:pointer;
+	background-position:left 4px;
+	background-repeat:no-repeat;
+	padding-left:18px;
+	line-height:18px;
+	}
+._downmenu_pp_title_leftImg{
+	 background-image:url('/static/images/FAQ-open.png');
+}
+._downmenu_pp_title_downImg{
+	 background-image:url('/static/images/FAQ-closed.png');
+}
+._downmenu_pp_body{
+	display:none;
+	width:660px;
+	color:#666;
+	border-top:1px solid #ccc;
+	padding-top:5px;
+	}
+._downmenu_pp_body ul{
+	margin:3px;
+	color:#666;
+	}
+._downmenu_pp_body ul li{
+	list-style-type:disc;
+	line-height:20px;
+	color:#666;
+	}
+._downmenu_pp_body span{
+	color:#666;
+	}
+#div_twolines/*FAQ -use*/
+{
+	height:40px;
+}	

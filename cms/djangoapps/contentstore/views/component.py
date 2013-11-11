@@ -123,6 +123,10 @@ def edit_subsection(request, location):
     return render_to_response(
         'edit_subsection.html',
         {
+#@begin:Pass location variable to the module and generate certain urls, such as preview
+#@date:2013-11-02        
+           'location':location,
+#@end
            'subsection': item,
            'context_course': course,
            'new_unit_category': 'vertical',

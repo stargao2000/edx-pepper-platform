@@ -9,7 +9,27 @@ import django.contrib.auth.views
 if settings.DEBUG or settings.MITX_FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):
     admin.autodiscover()
 
-urlpatterns = ('',  # nopep8
+urlpatterns = (
+    '',  # nopep8
+    # url(r'^sphinx$', 'people.views.sphinx'),
+
+    url(r'^contract/$', 'contract.views.index',name="contract_index"),
+    url(r'^contract/create$', 'contract.views.create',name="contract_create"),
+    url(r'^contract/modify/(?P<contract_id>[^/]+)$', 'contract.views.modify',name="contract_modify"),
+    url(r'^contract/import_user/$', 'contract.views.import_user',name="contract_import_user"),
+    url(r'^contract/import_user_submit/$', 'contract.views.import_user_submit',name="contract_import_user_submit"),
+    url(r'^contract/submit$', 'contract.views.submit_contract',name="contract_submit"),
+    
+    url(r'^course/(?P<course_id>[^/]+/[^/]+/[^/]+)/people/$', 'people.views.course_index', name="people"),
+    url(r'^course/(?P<course_id>[^/]+/[^/]+/[^/]+)/my_people/$', 'people.views.my_course_index', name="my_people"),
+
+    url(r'^people/$', 'people.views.people', name="people"),
+    url(r'^my_people/$', 'people.views.my_people', name="my_people"),
+
+    url(r'^download_certificate/$', 'student.views.download_certificate', name="download_certificate"),
+    url(r'^latest_news/$', 'student.views.latest_news', name="latest_news"),
+    url(r'^access_resource_library/$', 'access_resource_library.views.index', name="access_resource_library"),
+
     # certificate view
 
     url(r'^update_certificate$', 'certificates.views.update_certificate'),
@@ -23,6 +43,13 @@ urlpatterns = ('',  # nopep8
     url(r'^change_email$', 'student.views.change_email_request', name="change_email"),
     url(r'^email_confirm/(?P<key>[^/]*)$', 'student.views.confirm_email_change'),
     url(r'^change_name$', 'student.views.change_name_request', name="change_name"),
+
+    url(r'^change_school$', 'student.views.change_school_request', name="change_school"),
+    url(r'^change_change_grade_level$', 'student.views.change_grade_level_request', name="change_grade_level"),
+    url(r'^change_major_subject_area$', 'student.views.change_major_subject_area_request', name="change_major_subject_area"),
+    url(r'^change_bio$', 'student.views.change_bio_request', name="change_bio"),
+               url(r'^change_years_in_education$', 'student.views.change_years_in_education_request', name="change_years_in_education"),
+               
     url(r'^accept_name_change$', 'student.views.accept_name_change'),
     url(r'^reject_name_change$', 'student.views.reject_name_change'),
     url(r'^pending_name_changes$', 'student.views.pending_name_changes'),
@@ -129,7 +156,6 @@ for key, value in settings.MKTG_URL_LINK_MAP.items():
                         'static_template_view.views.render',
                         {'template': template}, name=value),)
 
-
 if settings.PERFSTATS:
     urlpatterns += (url(r'^reprofile$', 'perfstats.views.end_profile'),)
 
@@ -155,7 +181,6 @@ if settings.WIKI_ENABLED:
         url(r'^courses/(?:[^/]+/[^/]+/[^/]+)/wiki/', include(wiki_pattern())),
     )
 
-
 if settings.COURSEWARE_ENABLED:
     urlpatterns += (
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/jump_to/(?P<location>.*)$',
@@ -165,7 +190,6 @@ if settings.COURSEWARE_ENABLED:
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/modx/(?P<location>.*?)/(?P<dispatch>[^/]*)$',
             'courseware.module_render.modx_dispatch',
             name='modx_dispatch'),
-
 
         # Software Licenses
 
@@ -188,13 +212,27 @@ if settings.COURSEWARE_ENABLED:
         # url(r'^save_circuit/(?P<circuit>[^/]*)$', 'circuit.views.save_circuit'),
 
         url(r'^courses/?$', 'branding.views.courses', name="courses"),
+        url(r'^what_is$', 'branding.views.what_is', name="what_is"),
+        url(r'^districts$', 'branding.views.districts', name="districts"),
+        url(r'^_contact$', 'branding.views._contact', name="contact_us"),
+
+        url(r'^intro$', 'branding.views.intro', name="intro"),
+        url(r'^intro_research$', 'branding.views.intro_research', name="intro_research"),
+        url(r'^intro_ourteam$', 'branding.views.intro_ourteam', name="intro_ourteam"),
+        url(r'^intro_faq$', 'branding.views.intro_faq', name="intro_faq"),
+        
         url(r'^change_enrollment$',
             'student.views.change_enrollment', name="change_enrollment"),
         url(r'^change_email_settings$', 'student.views.change_email_settings', name="change_email_settings"),
 
         #About the course
+        
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/about$',
             'courseware.views.course_about', name="about_course"),
+
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/cabout$',
+            'courseware.views.cabout', name="cabout"),
+
         #View for mktg site (kept for backwards compatibility TODO - remove before merge to master)
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/mktg-about$',
             'courseware.views.mktg_course_about', name="mktg_about_course"),
@@ -248,6 +286,21 @@ if settings.COURSEWARE_ENABLED:
         # For the instructor
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor$',
             'instructor.views.legacy.instructor_dashboard', name="instructor_dashboard"),
+
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/portfolio/about_me$',
+            'portfolio.views.about_me', name="portfolio_about_me"),
+
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/portfolio/journal_and_reflections$',
+            'portfolio.views.journal_and_reflections', name="portfolio_journal_and_reflections"),  
+
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/portfolio/journal_and_reflections/(?P<chapter_id>[^/]+)$',
+            'portfolio.views.journal_and_reflections', name="portfolio_journal_and_reflections"),
+
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/portfolio/uploads$',
+            'portfolio.views.uploads', name="portfolio_uploads"), 
+
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/resource_library$',
+            'courseware.views.resource_library', name="resource_library"),        
 
         # see ENABLE_INSTRUCTOR_BETA_DASHBOARD section for more urls
 
@@ -382,7 +435,6 @@ if settings.MITX_FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD'):
 urlpatterns += (
     url(r'^shoppingcart/', include('shoppingcart.urls')),
 )
-
 
 if settings.MITX_FEATURES.get('AUTH_USE_OPENID_PROVIDER'):
     urlpatterns += (
