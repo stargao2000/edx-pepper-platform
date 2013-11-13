@@ -11,11 +11,15 @@ sys.setdefaultencoding('utf-8')
 class Get_confirm(SGMLParser):
     def reset(self):
         SGMLParser.reset(self)
-        self.urls=[]
+        self.score_urls=[]
+        self.state_urls=[]
     def start_section(self, attrs):
-        attr = [v for k, v in attrs if k=='data-score']
-        if attr:
-            self.urls.extend(attr)
+        score_attr = [v for k, v in attrs if k=='data-score']
+        state_attr = [v for k, v in attrs if k=='data-state']
+        if score_attr:
+            self.score_urls.extend(score_attr)
+        if state_attr:
+            self.state_urls.extend(state_attr)
 
 def add_edit_tool(data, course, descriptor):
     return '''<div>{0}<a class="blue_btn" href="{1}">Edit in Course</a>&nbsp;&nbsp;<a class="orange_btn" href="#">View & Join Discussion</a></div>'''.format(data,reverse('jump_to_id',args=(course.id,descriptor.location[4])))
@@ -32,7 +36,6 @@ def get_chaper_for_course(request, course, active_chapter):
         chapters.append({'display_name': chapter.display_name_with_default,
                          'url_name': chapter.url_name,
                          'active': chapter.url_name == active_chapter})
-                         #'active': False})
     return chapters
 def get_module_combinedopenended(request, course, location, isupload):
     location = course.location[0]+'://'+course.location[1]+'/'+course.location[2]+'/chapter/'+location
@@ -48,12 +51,9 @@ def get_module_combinedopenended(request, course, location, isupload):
         con = module.runtime.render(module, None, 'student_view').content
         confirm = Get_confirm()
         confirm.feed(con)
-        if confirm.urls[0] == 'correct':
+        if confirm.score_urls[0] == 'correct' and confirm.state_urls[0] == 'done':
             content.append(add_edit_tool(con,course,descriptor[x]))
-    import logging
-    log = logging.getLogger("tracking")
-    #log.debug("content===============================\n:"+str(reverse('jump_to_id',args=(course.id,'8f563e9f334f4f50a9c6d32ee3161b77')))+"\n===========================")
-    log.debug("content===============================\n:"+str(location)+"\n===========================")
+
     return content
 
    
